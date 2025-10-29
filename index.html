@@ -1,1 +1,72 @@
 # taskpage_
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>タスク管理アプリ</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>🗓️ タスク管理アプリ</h1>
+
+  <div class="task-container">
+    <input type="text" id="taskInput" placeholder="タスクを入力..." />
+    <button onclick="addTask()">追加</button>
+  </div>
+
+  <ul id="taskList"></ul>
+
+  <script>
+    // 🔹 ページ読み込み時に保存データを表示
+    window.onload = function() {
+      const savedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+      savedTasks.forEach(task => displayTask(task.text, task.done));
+    };
+
+    // 🔹 タスクを追加する
+    function addTask() {
+      const input = document.getElementById("taskInput");
+      const text = input.value.trim();
+      if (text === "") return;
+
+      displayTask(text, false);
+      saveTasks();
+      input.value = "";
+    }
+
+    // 🔹 タスクを画面に表示
+    function displayTask(text, done) {
+      const li = document.createElement("li");
+      li.textContent = text;
+      if (done) li.classList.add("done");
+
+      li.addEventListener("click", () => {
+        li.classList.toggle("done");
+        saveTasks();
+      });
+
+      const delBtn = document.createElement("button");
+      delBtn.textContent = "削除";
+      delBtn.onclick = () => {
+        li.remove();
+        saveTasks();
+      };
+
+      li.appendChild(delBtn);
+      document.getElementById("taskList").appendChild(li);
+    }
+
+    // 🔹 タスクをローカルストレージに保存
+    function saveTasks() {
+      const tasks = [];
+      document.querySelectorAll("li").forEach(li => {
+        tasks.push({
+          text: li.firstChild.textContent,
+          done: li.classList.contains("done")
+        });
+      });
+      localStorage.setItem("tasks", JSON.stringify(tasks));
+    }
+  </script>
+</body>
+</html>
